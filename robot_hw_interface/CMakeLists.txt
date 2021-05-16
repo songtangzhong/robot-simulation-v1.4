@@ -70,6 +70,7 @@ add_executable(start_controller
 target_include_directories(start_controller
   PRIVATE
   include
+  ${robot_info_INCLUDE_DIRS}
 )
 target_link_libraries(start_controller
   controller_configure

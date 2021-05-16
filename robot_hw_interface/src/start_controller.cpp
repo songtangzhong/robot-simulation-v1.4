@@ -3,6 +3,7 @@
 #include <string>
 #include <rclcpp/rclcpp.hpp>
 #include <robot_hw_interface/controller_configure.h>
+#include <robot_info/robot_macro.h>
 
 int main(int argc, char ** argv)
 {
@@ -20,10 +21,10 @@ int main(int argc, char ** argv)
     wait_ready.sleep();
   }
 
-  manager->load_start_controller("joint_state_controller");
-  manager->load_start_controller("position_controllers");
-  manager->load_configure_controller("velocity_controllers");
-  manager->load_configure_controller("effort_controllers");
+  manager->load_start_controller(JOINT_STATE_CONTROLLER);
+  manager->load_start_controller(POSITION_CONTROLLERS);
+  manager->load_configure_controller(VELOCITY_CONTROLLERS);
+  manager->load_configure_controller(EFFORT_CONTROLLERS);
 
   rclcpp::shutdown();
   return 0;
