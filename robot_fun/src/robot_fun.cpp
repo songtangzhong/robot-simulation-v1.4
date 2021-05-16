@@ -1,5 +1,6 @@
 #include <robot_fun/robot_fun.h>
 #include <memory>
+#include <robot_info/robot_macro.h>
 
 using std::placeholders::_1;
 using namespace std::chrono_literals;
@@ -12,14 +13,14 @@ Robot::Robot(const std::string & node_name)
     nh_ = std::make_shared<rclcpp::Node>("switch_controller_client");
 
     robot_state_sub_ = this->create_subscription<sensor_msgs::msg::JointState>(
-      "/joint_states", 100, std::bind(&Robot::callback_robot_state_sub_, this, _1));
+      JOINT_STATES, 100, std::bind(&Robot::callback_robot_state_sub_, this, _1));
 
     cmd_positions_pub_ = this->create_publisher<std_msgs::msg::Float64MultiArray>(
-        "/position_controllers/commands", 100);
+        POSITION_CONTROLLERS_COMMANDS, 100);
     cmd_velocities_pub_ = this->create_publisher<std_msgs::msg::Float64MultiArray>(
-        "/velocity_controllers/commands", 100);
+        VELOCITY_CONTROLLERS_COMMANDS, 100);
     cmd_efforts_pub_ = this->create_publisher<std_msgs::msg::Float64MultiArray>(
-        "/effort_controllers/commands", 100);
+        EFFORT_CONTROLLERS_COMMANDS, 100);
 
     switch_controller_cli_ = nh_->create_client<controller_manager_msgs::srv::SwitchController>
         ("/controller_manager/switch_controller");
@@ -208,15 +209,15 @@ std::string Robot::get_arm_control_mode(void)
     sem_common::semaphore_p(arm_sem_id_);
     if (arm_shm_->control_modes_[0] & robot_->position_mode_)
     {
-        control_mode = "position_mode";
+        control_mode = CONTROLLER_POSITION_MODE;
     }
     else if (arm_shm_->control_modes_[0] & robot_->velocity_mode_)
     {
-        control_mode = "velocity_mode";
+        control_mode = CONTROLLER_VELOCITY_MODE;
     }
     else if (arm_shm_->control_modes_[0] & robot_->effort_mode_)
     {
-        control_mode = "effort_mode";
+        control_mode = CONTROLLER_EFFORT_MODE;
     }
     sem_common::semaphore_v(arm_sem_id_);
 
@@ -228,17 +229,17 @@ int Robot::arm_switch_controller(const std::string & start_controller)
     std::string control_mode = get_arm_control_mode();
     std::string cur_controller;
 
-    if (control_mode == "position_mode")
+    if (control_mode == CONTROLLER_POSITION_MODE)
     {
-        cur_controller = "position_controllers";
+        cur_controller = POSITION_CONTROLLERS;
     }
-    else if (control_mode == "velocity_mode")
+    else if (control_mode == CONTROLLER_VELOCITY_MODE)
     {
-        cur_controller = "velocity_controllers";
+        cur_controller = VELOCITY_CONTROLLERS;
     }
-    else if (control_mode == "effort_mode")
+    else if (control_mode == CONTROLLER_EFFORT_MODE)
     {
-        cur_controller = "effort_controllers";
+        cur_controller = EFFORT_CONTROLLERS;
     }
 
     if (cur_controller == start_controller)
@@ -270,7 +271,7 @@ int Robot::arm_switch_controller(const std::string & start_controller)
     // Wait for the result.
     if (rclcpp::spin_until_future_complete(nh_, result) == rclcpp::FutureReturnCode::SUCCESS)
     {
-        if (start_controller == "position_controllers")
+        if (start_controller == POSITION_CONTROLLERS)
         {
             // Set current arm joint positions to commands by ros2 controller manager,
             // not by shared memory.
@@ -287,7 +288,7 @@ int Robot::arm_switch_controller(const std::string & start_controller)
             sem_common::semaphore_v(arm_sem_id_);
             cmd_positions_pub_->publish(cmd);
         }
-        else if (start_controller == "velocity_controllers")
+        else if (start_controller == VELOCITY_CONTROLLERS)
         {
             // Set current arm joint velocities (zeros) to commands by ros2 controller manager,
             // not by shared memory.
@@ -304,7 +305,7 @@ int Robot::arm_switch_controller(const std::string & start_controller)
             sem_common::semaphore_v(arm_sem_id_);
             cmd_velocities_pub_->publish(cmd);
         }
-        else if (start_controller == "effort_controllers")
+        else if (start_controller == EFFORT_CONTROLLERS)
         {
             // Set current arm joint efforts (zeros) to commands by ros2 controller manager,
             // not by shared memory.
@@ -434,15 +435,15 @@ std::string Robot::get_gripper_control_mode(void)
     sem_common::semaphore_p(gripper_sem_id_);
     if (gripper_shm_->control_modes_[0] & robot_->position_mode_)
     {
-        control_mode = "position_mode";
+        control_mode = CONTROLLER_POSITION_MODE;
     }
     else if (gripper_shm_->control_modes_[0] & robot_->velocity_mode_)
     {
-        control_mode = "velocity_mode";
+        control_mode = CONTROLLER_VELOCITY_MODE;
     }
     else if (gripper_shm_->control_modes_[0] & robot_->effort_mode_)
     {
-        control_mode = "effort_mode";
+        control_mode = CONTROLLER_EFFORT_MODE;
     }
     sem_common::semaphore_v(gripper_sem_id_);
 
