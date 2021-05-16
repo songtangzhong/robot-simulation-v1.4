@@ -11,7 +11,7 @@
 
     <include>
       <uri>model://panda</uri>
-      <!--<plugin name="gazebo_control_plugin" filename="libgazebo_control_plugin.so" />-->
+      <plugin name="gazebo_control_plugin" filename="libgazebo_control_plugin.so" />
     </include>
 
     <physics type="ode">
