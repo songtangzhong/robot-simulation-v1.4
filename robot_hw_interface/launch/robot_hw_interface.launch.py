@@ -14,7 +14,7 @@ def generate_launch_description():
     )
     robot_description_config = xacro.process_file(
         robot_description_path,
-        mappings={'gripper': 'false', 'gazebo': 'false'}
+        mappings={'gripper': 'true', 'gazebo': 'false'}
     )
     robot_description = {'robot_description': robot_description_config.toxml()}
 
